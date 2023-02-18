@@ -3,6 +3,7 @@
 
 void disableBuffer();
 void enableBuffer();
+int kbhit(void);
 
 #endif
 

@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include "terminal.h"
 #include <time.h>
+#include <unistd.h>
+#include<termios.h>
+#include <fcntl.h>
+
 
 
 void displayGrid(char **grid) {
@@ -23,7 +27,6 @@ char **createGrid(){
             grid[i][j] = ' ';  // fill with space character
         }
     }
-
     grid[1][1] = '>';
     grid[4][4] = '@';
 
@@ -40,23 +43,38 @@ char **createGrid(){
     return grid;
 }
 
-void moveSnake(char move, char **grid, int *x, int *y,int *points) {
+typedef enum Bool {
+    FALSE = 0,
+    TRUE = 1
+}bool;
+
+void moveSnake(char move, char **grid, int *x, int *y,int *points, int *tail_x, int *tail_y, int *snake_size,bool *endgame) {
     int new_x = *x;
     int new_y = *y;
+    int prev_x = *tail_x;
+    int prev_y = *tail_y;
+    int movecount =0;
+    
     
     
     // Update the position based on the move
     if (move == 'w') {
+        movecount++;
         new_x--;
     } else if (move == 's') {
+        movecount++;
         new_x++;
     } else if (move == 'd') {
+        movecount++;
         new_y++;
     } else if (move == 'a') {
+        movecount++;
         new_y--;
     } 
+    
     // Check for collision with the obstacle or out of bounds
     if (new_x < 0 || new_x > 8 || new_y < 0 || new_y > 8 || grid[new_x][new_y] == '|' || grid[new_x][new_y] == '-' ) {
+        *endgame = TRUE;
         // Collision detected, do nothing
         return;
     }
@@ -71,10 +89,16 @@ void moveSnake(char move, char **grid, int *x, int *y,int *points) {
             rand_y = rand() % 7 + 1;
         }
         grid[rand_x][rand_y] = '@';
+        (*snake_size)++;
     }
     
     // Update the grid with the new position of the snake
     grid[*x][*y] = ' ';
+    // if (*snake_size >1) {
+        
+    //     grid[*x][*y] = '-';
+    //     }
+
     *x = new_x;
     *y = new_y;
     if (move == 'w') {
@@ -96,22 +120,26 @@ int main() {
     int x=1;
     int y=1;
     char **grid;
-    char move;
-    int points;
+    char move='d';
+    int tail_x = 1;
+    int tail_y = 1;
+    int points =0;
+    int snake_size = 1;
     grid =createGrid();
+    bool endgame=FALSE;
 
-    while(1){
+    while(endgame !=TRUE){
         printf("Score: %d\n",points);
         disableBuffer();
         displayGrid(grid);
-        scanf(" %c", &move);
-        moveSnake(move,grid,&x,&y,&points);
+        while(kbhit()) { // check if there is a new input from the user
+            move = getchar();
+        }
+        moveSnake(move,grid,&x,&y,&points,&tail_x,&tail_y,&snake_size,&endgame);
+        usleep(180000);
         system("clear");
 
     }
-
-
-
 
 
     // Free memory used by grid
