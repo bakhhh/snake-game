@@ -1,6 +1,6 @@
 C		 = gcc
 EXEC	 = snake
-CFLAGS = -Wall -ansi -pedantic
+CFLAGS = -Wall 
 OBJ 	 = terminal.o main.o 
 
 ifdef DEBUG
