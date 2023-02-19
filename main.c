@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include<termios.h>
 #include <fcntl.h>
+#include "linkedlist.h"
 
 
 
@@ -48,14 +49,39 @@ typedef enum Bool {
     TRUE = 1
 }bool;
 
-void moveSnake(char move, char **grid, int *x, int *y,int *points, int *snake_size, bool *endgame,int *speed) {
-    int new_x = *x;
-    int new_y = *y;
+void detectCollisions(char **grid, int new_x, int new_y,bool *endgame, int *points, int *snake_size,int *speed){
     int rand_x;
     int rand_y;
-    // int prev_x = *tail_x;
-    // int prev_y = *tail_y;
-    
+        // Check for collision with the obstacle or out of bounds
+    if (new_x < 0 || new_x > 8 || new_y < 0 || new_y > 8 || grid[new_x][new_y] == '|' || grid[new_x][new_y] == '-') {
+        *endgame = TRUE;
+        return;
+    } else if (grid[new_x][new_y] == '*') {
+        // Collision detected with '*', randomly place a new one
+        (*points)++;
+        (*speed) *= 0.985;
+        (*snake_size)++;
+        srand(time(NULL));
+        rand_x = rand() % 7 + 1;
+        rand_y = rand() % 7 + 1;
+        while (grid[rand_x][rand_y] != ' ') {
+            rand_x = rand() % 7 + 1;
+            rand_y = rand() % 7 + 1;
+        }
+        grid[rand_x][rand_y] = '*';
+    }
+
+
+}
+
+void moveSnake(char move, char **grid, int *x, int *y, int *points, int *snake_size, bool *endgame, int *speed,int *tail_x, int *tail_y) {
+    int new_x = *x;
+    int new_y = *y;
+    int prevX;
+    int prevY;
+    int prev2X;
+    int prev2Y;
+
 
     // Update the position based on the move
     if (move == 'w') {
@@ -67,45 +93,59 @@ void moveSnake(char move, char **grid, int *x, int *y,int *points, int *snake_si
     } else if (move == 'a') {
         new_y--;
     } 
-    
-    // Check for collision with the obstacle or out of bounds
-    if (new_x < 0 || new_x > 8 || new_y < 0 || new_y > 8 || grid[new_x][new_y] == '|' || grid[new_x][new_y] == '-' ) {
-        *endgame = TRUE;
-        return;
-    }
-    else if (grid[new_x][new_y] == '*') {
-        // Collision detected with '@', randomly place a new one
-        (*points)++;
-        (*speed)*=0.985;
-        srand(time(NULL));
-        rand_x = rand() % 7 + 1;
-        rand_y = rand() % 7 + 1;
-        while (grid[rand_x][rand_y] != ' ') {
-            rand_x = rand() % 7 + 1;
-            rand_y = rand() % 7 + 1;
-        }
-        grid[rand_x][rand_y] = '*';
-    }
-    
+
+    detectCollisions(grid,new_x,new_y,endgame,points,snake_size,speed);
+
     // Update the grid with the new position of the snake
+    prev2X = *tail_x;
+    prev2Y = *tail_y;
+    prevX = *x;
+    prevY = *y;
+    
     grid[*x][*y] = ' ';
-    // if (*snake_size >1) {
-        
-    //     grid[*x][*y] = '-';
-    //     }
+
+  
+
 
     *x = new_x;
     *y = new_y;
+    
     if (move == 'w') {
         grid[*x][*y] = '^';
+        
     } else if (move == 's') {
         grid[*x][*y] = 'v';
+       
     } else if (move == 'd') {
         grid[*x][*y] = '>';
+       
+
     } else if (move == 'a') {
         grid[*x][*y] = '<';
+
     }
+    *tail_x = prevX;
+    *tail_y = prevY;
+
+    if (*snake_size > 1) {
+        
+        grid[prevX][prevY] = '-';
+        grid[prev2X][prev2Y] = ' ';
+     
+    }
+
+    // Assign the values of prevX and prevY to prev2X and prev2Y
+  
+  
+
+    // printf("\ncurrent pos:%d %d\n",*x,*y);
+    // printf("\nprevious position: %d %d\n",prevX,prevY);
+    // printf("\n2nd previous position: %d %d\n",prev2X,prev2Y);
+    // printf("\nsnake size: %d \n",*snake_size);
+
+
 }
+
 
 
 
@@ -132,8 +172,9 @@ int main() {
         while(kbhit()) { // check if there is a new input from the user
             move = getchar();
         }
+        
 
-        moveSnake(move,grid,&x,&y,&points,&snake_size,&endgame,&speed);
+        moveSnake(move,grid,&x,&y,&points,&snake_size,&endgame,&speed,&tail_x,&tail_y);
         usleep(speed);
         system("clear");
 
