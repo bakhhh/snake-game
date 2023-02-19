@@ -177,8 +177,6 @@ int main() {
         while(kbhit()) { // check if there is a new input from the user
             move = getchar();
         }
-        
-
         moveSnake(move,grid,&x,&y,&points,&snake_size,&endgame,&speed,&tail_x,&tail_y);
         usleep(speed);
         system("clear");
