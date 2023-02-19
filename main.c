@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include<termios.h>
 #include <fcntl.h>
-#include "linkedlist.h"
+
 
 
 
@@ -52,6 +52,7 @@ typedef enum Bool {
 void detectCollisions(char **grid, int new_x, int new_y,bool *endgame, int *points, int *snake_size,int *speed){
     int rand_x;
     int rand_y;
+    
         // Check for collision with the obstacle or out of bounds
     if (new_x < 0 || new_x > 8 || new_y < 0 || new_y > 8 || grid[new_x][new_y] == '|' || grid[new_x][new_y] == '-') {
         *endgame = TRUE;
@@ -61,6 +62,7 @@ void detectCollisions(char **grid, int new_x, int new_y,bool *endgame, int *poin
         (*points)++;
         (*speed) *= 0.985;
         (*snake_size)++;
+        
         srand(time(NULL));
         rand_x = rand() % 7 + 1;
         rand_y = rand() % 7 + 1;
@@ -104,9 +106,6 @@ void moveSnake(char move, char **grid, int *x, int *y, int *points, int *snake_s
     
     grid[*x][*y] = ' ';
 
-  
-
-
     *x = new_x;
     *y = new_y;
     
@@ -127,17 +126,14 @@ void moveSnake(char move, char **grid, int *x, int *y, int *points, int *snake_s
     *tail_x = prevX;
     *tail_y = prevY;
 
-    if (*snake_size > 1) {
-        
+
+    for (int i = 1; i < *snake_size; i++) {
         grid[prevX][prevY] = '-';
         grid[prev2X][prev2Y] = ' ';
-     
     }
-
-    // Assign the values of prevX and prevY to prev2X and prev2Y
-  
   
 
+   
     // printf("\ncurrent pos:%d %d\n",*x,*y);
     // printf("\nprevious position: %d %d\n",prevX,prevY);
     // printf("\n2nd previous position: %d %d\n",prev2X,prev2Y);
