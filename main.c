@@ -84,54 +84,63 @@ void moveSnake(char move, char **grid, int *x, int *y, int *points, int *snake_s
     int prev2X;
     int prev2Y;
 
+    if (move!='w' && move!='s' && move!='a' && move!='d')
+    {
+        printf("Error to move enter w,s,a,d\n");
+    }
+    else{
 
-    // Update the position based on the move
-    if (move == 'w') {
-        new_x--;
-    } else if (move == 's') {
-        new_x++;
-    } else if (move == 'd') {
-        new_y++;
-    } else if (move == 'a') {
-        new_y--;
-    } 
-
-    detectCollisions(grid,new_x,new_y,endgame,points,snake_size,speed);
-
-    // Update the grid with the new position of the snake
-    prev2X = *tail_x;
-    prev2Y = *tail_y;
-    prevX = *x;
-    prevY = *y;
-    
-    grid[*x][*y] = ' ';
-
-    *x = new_x;
-    *y = new_y;
-    
-    if (move == 'w') {
-        grid[*x][*y] = '^';
         
-    } else if (move == 's') {
-        grid[*x][*y] = 'v';
-       
-    } else if (move == 'd') {
-        grid[*x][*y] = '>';
-       
 
-    } else if (move == 'a') {
-        grid[*x][*y] = '<';
 
+        // Update the position based on the move
+        if (move == 'w') {
+            new_x--;
+        } else if (move == 's') {
+            new_x++;
+        } else if (move == 'd') {
+            new_y++;
+        } else if (move == 'a') {
+            new_y--;
+        } 
+
+        detectCollisions(grid,new_x,new_y,endgame,points,snake_size,speed);
+
+        // Update the grid with the new position of the snake
+        prev2X = *tail_x;
+        prev2Y = *tail_y;
+        prevX = *x;
+        prevY = *y;
+        
+        grid[*x][*y] = ' ';
+
+        *x = new_x;
+        *y = new_y;
+        
+        if (move == 'w') {
+            grid[*x][*y] = '^';
+            
+        } else if (move == 's') {
+            grid[*x][*y] = 'v';
+        
+        } else if (move == 'd') {
+            grid[*x][*y] = '>';
+        
+
+        } else if (move == 'a') {
+            grid[*x][*y] = '<';
+
+        }
+        *tail_x = prevX;
+        *tail_y = prevY;
+
+
+        for (int i = 1; i < *snake_size; i++) {
+            grid[prevX][prevY] = '-';
+            grid[prev2X][prev2Y] = ' ';
+        }
     }
-    *tail_x = prevX;
-    *tail_y = prevY;
-
-
-    for (int i = 1; i < *snake_size; i++) {
-        grid[prevX][prevY] = '-';
-        grid[prev2X][prev2Y] = ' ';
-    }
-  
+    
 
    
     // printf("\ncurrent pos:%d %d\n",*x,*y);
