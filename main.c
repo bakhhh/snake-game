@@ -25,7 +25,7 @@ char **createGrid(){
     for (i = 0; i < 9; i++) {
         grid[i] = (char *) malloc(9 * sizeof(char));
         for (j = 0; j < 9; j++) {
-            grid[i][j] = ' ';  // fill with space character
+            grid[i][j] = ' ';  // fill with space 
         }
     }
     grid[1][1] = '>';
